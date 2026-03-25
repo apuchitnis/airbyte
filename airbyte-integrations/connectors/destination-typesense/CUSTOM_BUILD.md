@@ -20,8 +20,9 @@ Edit the connector code in this directory. Key files:
 ```
 destination_typesense/
 ├── destination.py       # Main connector logic
-├── writer.py            # Typesense writer
+├── writer.py            # Typesense writer (upsert logic)
 └── ...
+Dockerfile               # Custom build image definition
 pyproject.toml           # Dependencies (including airbyte-cdk version)
 metadata.yaml            # Connector metadata & version
 ```
@@ -30,24 +31,16 @@ metadata.yaml            # Connector metadata & version
 
 Update `metadata.yaml`:
 ```yaml
-dockerImageTag: 0.1.54  # Increment from current version
+dockerImageTag: 0.1.57  # Increment from current version
 ```
 
 ### 3. Build the Docker Image
-
-Create a `Dockerfile` in this directory (if it doesn't exist):
-```dockerfile
-FROM airbyte/destination-typesense:latest
-
-COPY . ./airbyte/integration_code
-RUN pip install ./airbyte/integration_code
-```
 
 Build for `linux/amd64` architecture (required for K8s workers):
 ```bash
 cd airbyte-integrations/connectors/destination-typesense
 
-docker buildx build --platform linux/amd64 -t public.ecr.aws/w7s0q8d5/destination-typesense:0.1.54 .
+docker buildx build --platform linux/amd64 -t public.ecr.aws/w7s0q8d5/destination-typesense:<version> .
 ```
 
 ### 4. Push to Public ECR
@@ -57,7 +50,7 @@ docker buildx build --platform linux/amd64 -t public.ecr.aws/w7s0q8d5/destinatio
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
 # Push the image
-docker push public.ecr.aws/w7s0q8d5/destination-typesense:0.1.54
+docker push public.ecr.aws/w7s0q8d5/destination-typesense:<version>
 ```
 
 ### 5. Update Airbyte to Use New Version
