@@ -1,5 +1,6 @@
 FROM airbyte/destination-typesense:latest
 
-ENV HOME=/tmp
-COPY . ./airbyte/integration_code
-RUN pip install --no-cache-dir ./airbyte/integration_code
+USER root
+COPY . .
+RUN pip install --no-cache-dir --no-deps --break-system-packages .
+USER airbyte
