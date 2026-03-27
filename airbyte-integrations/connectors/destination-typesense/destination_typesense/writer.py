@@ -45,5 +45,5 @@ class TypesenseWriter:
             grouped_by_stream[stream].append(data)
 
         for stream, data in grouped_by_stream.items():
-            self.client.collections[stream].documents.import_(data)
+            self.client.collections[stream].documents.import_(data, {"action": "upsert"})
         self.write_buffer.clear()
